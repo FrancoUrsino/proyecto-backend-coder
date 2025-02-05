@@ -14,10 +14,25 @@ router.get('/:pid', async (req, res) => {
     product ? res.json(product) : res.status(404).json({ error: 'Producto no encontrado' });
 });
 
-router.post('/', async (req, res) => {
-    const newProduct = await productManager.addProduct(req.body);
-    res.json(newProduct);
+router.post("/", async (req, res) => {
+  try {
+      const { title, price } = req.body;
+
+      if (!title || !price) {
+          return res.status(400).json({ error: "Faltan datos obligatorios (title y price)" });
+      }
+
+      const products = await readProducts();
+      const newId = products.length ? products[products.length - 1].id + 1 : 1;
+      const newProduct = { id: newId, title, price };
+      products.push(newProduct);
+      await writeProducts(products);
+      res.status(201).json(newProduct);
+  } catch (error) {
+      res.status(500).json({ error: "Error al guardar el producto" });
+  }
 });
+
 
 router.put('/:pid', async (req, res) => {
     const updatedProduct = await productManager.updateProduct(Number(req.params.pid), req.body);
