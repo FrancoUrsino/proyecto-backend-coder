@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos en Tiempo Real</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io();
+            socket.on("connect", () => {
+                console.log("Conectado al servidor");
+            });
+            socket.on("updateProducts", (products) => {
+                console.log("Lista de productos actualizada:", products);
+
+                const productList = document.getElementById("product-list");
+                productList.innerHTML = "";
+                if (Array.isArray(products)) {
+                    products.forEach(product => {
+                        const li = document.createElement("li");
+                        li.textContent = `${product.title} - $${product.price}`;
+                        productList.appendChild(li);
+                    });
+                } else {
+                    console.error("Error: 'products' no es un array", products);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Productos en Tiempo Real</h1>
+    <ul id="product-list"></ul>
+</body>
+</html>

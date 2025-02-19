@@ -1,5 +1,6 @@
-const express = require('express');
-const ProductManager = require('../managers/ProductManager');
+import express from 'express';
+import ProductManager from '../managers/ProductManager.js';
+// const ProductManager = require('../managers/ProductManager');
 
 const router = express.Router();
 const productManager = new ProductManager();
@@ -15,22 +16,22 @@ router.get('/:pid', async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  try {
-      const { title, price } = req.body;
+    try {
+        const { title, price } = req.body;
 
-      if (!title || !price) {
-          return res.status(400).json({ error: "Faltan datos obligatorios (title y price)" });
-      }
+        if (!title || !price) {
+            return res.status(400).json({ error: "Faltan datos obligatorios (title y price)" });
+        }
 
-      const products = await readProducts();
-      const newId = products.length ? products[products.length - 1].id + 1 : 1;
-      const newProduct = { id: newId, title, price };
-      products.push(newProduct);
-      await writeProducts(products);
-      res.status(201).json(newProduct);
-  } catch (error) {
-      res.status(500).json({ error: "Error al guardar el producto" });
-  }
+        const products = await readProducts();
+        const newId = products.length ? products[products.length - 1].id + 1 : 1;
+        const newProduct = { id: newId, title, price };
+        products.push(newProduct);
+        await writeProducts(products);
+        res.status(201).json(newProduct);
+    } catch (error) {
+        res.status(500).json({ error: "Error al guardar el producto" });
+    }
 });
 
 
@@ -44,4 +45,6 @@ router.delete('/:pid', async (req, res) => {
     res.json({ message: 'Producto eliminado' });
 });
 
-module.exports = router;
+export default router;
+
+
