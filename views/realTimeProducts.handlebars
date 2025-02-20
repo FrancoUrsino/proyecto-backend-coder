@@ -8,22 +8,55 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const socket = io();
+
             socket.on("connect", () => {
-                console.log("Conectado al servidor");
+                console.log("Usuario conectado al servidor");
             });
+
             socket.on("updateProducts", (products) => {
                 console.log("Lista de productos actualizada:", products);
 
                 const productList = document.getElementById("product-list");
                 productList.innerHTML = "";
+
                 if (Array.isArray(products)) {
                     products.forEach(product => {
                         const li = document.createElement("li");
                         li.textContent = `${product.title} - $${product.price}`;
                         productList.appendChild(li);
                     });
+                }
+            });
+            document.getElementById("addProductForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const title = document.getElementById("title").value;
+                const price = document.getElementById("price").value;
+
+                const response = await fetch("/api/products/add", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title, price })
+                });
+
+                if (response.ok) {
+                    console.log("Producto agregado correctamente");
+                    document.getElementById("addProductForm").reset();
                 } else {
-                    console.error("Error: 'products' no es un array", products);
+                    console.error("Error al agregar producto");
+                }
+            });
+
+            document.getElementById("deleteProductForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const id = document.getElementById("deleteId").value;
+
+                const response = await fetch(`/api/products/delete/${id}`, { method: "DELETE" });
+
+                if (response.ok) {
+                    console.log("Producto eliminado correctamente");
+                    document.getElementById("deleteProductForm").reset();
+                } else {
+                    console.error("Error al eliminar producto");
                 }
             });
         });
@@ -32,5 +65,18 @@
 <body>
     <h1>Productos en Tiempo Real</h1>
     <ul id="product-list"></ul>
+
+    <h2>Agregar Producto</h2>
+    <form id="addProductForm">
+        <input type="text" id="title" placeholder="Nombre del producto" required>
+        <input type="number" id="price" placeholder="Precio" required>
+        <button type="submit">Agregar</button>
+    </form>
+
+    <h2>Eliminar Producto</h2>
+    <form id="deleteProductForm">
+        <input type="number" id="deleteId" placeholder="ID del producto" required>
+        <button type="submit">Eliminar</button>
+    </form>
 </body>
 </html>

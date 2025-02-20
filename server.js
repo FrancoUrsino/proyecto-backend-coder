@@ -11,11 +11,13 @@ import ProductManager from './managers/ProductManager.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
 const productManager = new ProductManager();
 
+app.set("io", io);
 app.engine('handlebars', exphbs.engine());
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'));
@@ -37,21 +39,9 @@ io.on('connection', async (socket) => {
         console.error("Error obteniendo productos:", error);
         socket.emit("updateProducts", []);
     }
-
-    socket.on("newProduct", async (product) => {
-        await productManager.addProduct(product);
-        const updatedProducts = await productManager.getProducts();
-        io.emit("updateProducts", updatedProducts);
-    });
-
-    socket.on("deleteProduct", async (id) => {
-        await productManager.deleteProduct(id);
-        const updatedProducts = await productManager.getProducts();
-        io.emit("updateProducts", updatedProducts);
-    });
 });
 
 const PORT = 8080;
 server.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
