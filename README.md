@@ -1,6 +1,6 @@
 # GESTION BACKEND DE E-COMMERCE
 
-Proyecto creado para el curso de backend de CoderHouse. Primer pre entrega:
+Proyecto creado para el curso de backend de CoderHouse. Segunda pre entrega:
 
 ## Pruebas realizadas con PostMan
 
@@ -40,4 +40,23 @@ Proyecto creado para el curso de backend de CoderHouse. Primer pre entrega:
  - Postman
 
 **Dependecias instaladas**
- - Nodemon 
+ - Nodemon
+ - Express Handlebars
+ - Socket.io
+
+ 
+## WebSockets (Socket.io)
+
+Este proyecto utiliza **WebSockets** con `Socket.io` para actualizar la lista de productos en tiempo real sin necesidad de recargar la página.
+
+- Cuando un usuario agrega o elimina un producto mediante HTTP (`POST/DELETE`), se emite un evento WebSocket para actualizar la lista en todos los clientes conectados.
+- En el frontend, se escucha el evento `updateProducts` para mostrar los productos actualizados automáticamente.
+
+
+## Handlebars 
+
+El proyecto utiliza **Handlebars** como motor de plantillas para renderizar vistas dinámicas en el servidor.
+
+ - Genera HTML dinámico
+ - Separa la lógica del backend de la del frontend.
+ - Facilita la reutilización de componentes 
