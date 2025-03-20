@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito de Compras</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-4">Carrito de Compras</h1>
+
+    {{#if products.length}}
+    <ul class="bg-white shadow-md p-4 rounded-lg">
+      {{#each products}}
+      <li class="border-b py-2">
+        <h3 class="text-lg font-semibold">{{this.title}}</h3>
+        <p>Precio: ${{this.price}}</p>
+        <p>Cantidad: {{this.quantity}}</p>
+      </li>
+      {{/each}}
+    </ul>
+    <button id="checkoutBtn" data-cart-id="{{cartId}}" class="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg">
+      Finalizar Compra
+    </button>
+    {{else}}
+    <p class="text-gray-500">El carrito está vacío.</p>
+    {{/if}}
+  </div>
+
+  <script>
+    document.getElementById("checkoutBtn").addEventListener("click", async (event) => {
+      const cartId = event.target.getAttribute("data-cart-id");
+
+      if (!cartId) {
+        alert("Error: No se encontró el ID del carrito.");
+        return;
+      }
+
+      const response = await fetch("/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartId })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert("Compra realizada con éxito");
+        window.location.reload();
+      } else {
+        alert("Error al finalizar la compra: " + data.error);
+      }
+    });
+  </script>
+</body>
+
+</html>

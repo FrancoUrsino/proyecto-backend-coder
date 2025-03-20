@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-center">
+  <nav class="bg-blue-600 p-4">
+    <ul class="flex justify-center space-x-6 text-white font-semibold">
+      <li><a href="/" class="hover:text-gray-300">Inicio</a></li>
+      <li><a href="/productos" class="hover:text-gray-300">Productos</a></li>
+      <li><a href="/carrito" class="hover:text-gray-300">Carrito</a></li>
+    </ul>
+  </nav>
+  <div class="p-6">
+    <form action="/productos" method="GET" class="bg-white p-4 rounded-lg shadow-md max-w-2xl mx-auto mb-6">
+      <div class="flex flex-wrap justify-center gap-4">
+        <input type="text" name="query" placeholder="Buscar por nombre..." value="{{query}}"
+          class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <select name="sort" class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">Ordenar por</option>
+          <option value="asc" {{#if (eq sort "asc" )}}selected{{/if}}>Precio: Menor a Mayor</option>
+          <option value="desc" {{#if (eq sort "desc" )}}selected{{/if}}>Precio: Mayor a Menor</option>
+        </select>
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition">
+          Aplicar Filtros 🔍
+        </button>
+      </div>
+    </form>
+    {{{body}}}
+  </div>
+</body>
+
+</html>

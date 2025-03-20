@@ -1,82 +1,89 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productos en Tiempo Real</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const socket = io();
-
-            socket.on("connect", () => {
-                console.log("Usuario conectado al servidor");
-            });
-
-            socket.on("updateProducts", (products) => {
-                console.log("Lista de productos actualizada:", products);
-
-                const productList = document.getElementById("product-list");
-                productList.innerHTML = "";
-
-                if (Array.isArray(products)) {
-                    products.forEach(product => {
-                        const li = document.createElement("li");
-                        li.textContent = `${product.title} - $${product.price}`;
-                        productList.appendChild(li);
-                    });
-                }
-            });
-            document.getElementById("addProductForm").addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const title = document.getElementById("title").value;
-                const price = document.getElementById("price").value;
-
-                const response = await fetch("/api/products/add", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ title, price })
-                });
-
-                if (response.ok) {
-                    console.log("Producto agregado correctamente");
-                    document.getElementById("addProductForm").reset();
-                } else {
-                    console.error("Error al agregar producto");
-                }
-            });
-
-            document.getElementById("deleteProductForm").addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const id = document.getElementById("deleteId").value;
-
-                const response = await fetch(`/api/products/delete/${id}`, { method: "DELETE" });
-
-                if (response.ok) {
-                    console.log("Producto eliminado correctamente");
-                    document.getElementById("deleteProductForm").reset();
-                } else {
-                    console.error("Error al eliminar producto");
-                }
-            });
-        });
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos en Tiempo Real</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Productos en Tiempo Real</h1>
-    <ul id="product-list"></ul>
 
-    <h2>Agregar Producto</h2>
-    <form id="addProductForm">
-        <input type="text" id="title" placeholder="Nombre del producto" required>
-        <input type="number" id="price" placeholder="Precio" required>
-        <button type="submit">Agregar</button>
-    </form>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">🛒 Productos</h1>
 
-    <h2>Eliminar Producto</h2>
-    <form id="deleteProductForm">
-        <input type="number" id="deleteId" placeholder="ID del producto" required>
-        <button type="submit">Eliminar</button>
-    </form>
+
+  <div id="product-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl"></div>
+
+
+  <div class="flex gap-4 mt-6">
+    <button id="prevPage" class="bg-gray-500 text-white px-4 py-2 rounded disabled:opacity-50">Anterior</button>
+    <span id="pageNumber" class="text-lg font-bold text-gray-700"></span>
+    <button id="nextPage" class="bg-gray-500 text-white px-4 py-2 rounded disabled:opacity-50">Siguiente</button>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    const limit = 6;
+
+    async function fetchProducts(page = 1) {
+      try {
+        const response = await fetch(`/api/products?page=${page}&limit=${limit}`);
+        const data = await response.json();
+
+        if (!data.products) {
+          console.error("No se encontraron productos en la API.");
+          return;
+        }
+
+        renderProducts(data.products);
+        updatePagination(page, data.totalPages);
+      } catch (error) {
+        console.error("Error al obtener productos:", error);
+      }
+    }
+
+    function renderProducts(products) {
+      const productContainer = document.getElementById("product-container");
+      productContainer.innerHTML = "";
+
+      products.forEach(product => {
+        const productCard = document.createElement("div");
+        productCard.classList.add("bg-white", "p-4", "rounded-lg", "shadow-md", "text-center", "flex", "flex-col", "items-center", "gap-2");
+
+        productCard.innerHTML = `
+                    <img src="/images/${product.image}" alt="${product.title}" class="w-32 h-32 object-cover rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800">${product.title}</h3>
+                    <p class="text-gray-600">${product.description}</p>
+                    <p class="text-green-600 font-bold text-lg">$${product.price}</p>
+                    <p class="text-sm text-gray-500">Stock: ${product.stock}</p>
+                    <p class="text-xs text-gray-400">Categoría: ${product.category}</p>
+                    <p class="text-xs text-gray-500">📅 ${new Date(product.createdAt).toLocaleDateString()}</p>
+                `;
+
+        productContainer.appendChild(productCard);
+      });
+    }
+
+    function updatePagination(page, totalPages) {
+      document.getElementById("pageNumber").textContent = `Página ${page} de ${totalPages}`;
+      document.getElementById("prevPage").disabled = page === 1;
+      document.getElementById("nextPage").disabled = page === totalPages;
+
+      currentPage = page;
+    }
+
+    document.getElementById("prevPage").addEventListener("click", () => {
+      if (currentPage > 1) fetchProducts(currentPage - 1);
+    });
+
+    document.getElementById("nextPage").addEventListener("click", () => {
+      fetchProducts(currentPage + 1);
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchProducts();
+    });
+  </script>
 </body>
+
 </html>

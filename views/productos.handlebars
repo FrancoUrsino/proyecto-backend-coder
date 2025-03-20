@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-center p-6">
+  {{!< productosLayout}} <h1 class="text-3xl font-bold text-gray-800 mb-4">Lista de Productos</h1>
+    <p class="text-lg text-gray-600">Página actual: {{page}}</p>
+
+    {{#if products.length}}
+    <ul class="flex flex-wrap justify-center gap-6 mt-6">
+      {{#each products}}
+      <li class="bg-white p-6 rounded-lg shadow-md w-72 transition-transform transform hover:scale-105">
+        <h3 class="text-xl font-semibold">
+          <a href="/productos/{{this._id}}" class="text-blue-600 hover:text-blue-800">{{this.title}}</a>
+        </h3>
+        <p class="text-gray-700 text-lg mt-2">Precio: ${{this.price}}</p>
+        <p class="text-gray-500 text-sm">Categoría: {{this.category}}</p>
+        {{#if this.image}}
+        <img src="{{this.image}}" alt="Imagen de {{this.title}}" class="w-full h-40 object-cover mt-3 rounded-md">
+        {{/if}}
+      </li>
+      {{/each}}
+    </ul>
+
+    <div class="mt-6 flex justify-center gap-4">
+      {{#if hasPrevPage}}
+      <a href="{{prevPage}}" class="px-4 py-2 bg-gray-300 text-gray-800 rounded">Anterior</a>
+      {{/if}}
+      <span class="px-4 py-2 bg-blue-500 text-white rounded">Página {{page}} de {{totalPages}}</span>
+      {{#if hasNextPage}}
+      <a href="{{nextPage}}" class="px-4 py-2 bg-gray-300 text-gray-800 rounded">Siguiente</a>
+      {{/if}}
+    </div>
+    {{else}}
+    <p class="text-gray-500 text-lg mt-6">No hay productos disponibles.</p>
+    {{/if}}
+</body>
+
+</html>
